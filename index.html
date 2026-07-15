@@ -145,8 +145,16 @@ td.venc{ white-space:nowrap; font-variant-numeric:tabular-nums; }
     </div>
 
     <div class="alert">
-      <h3>Conferência do link recebido do escritório do AJ</h3>
-      <p>Dos 16 itens informados, <b>9 têm documento na pasta "Agendamentos"</b> (nota fiscal, boleto ou guia oficial) e <b>7 não constam no link</b> — DAM da TFF, Aluguel, COFINS, PIS, CSLL, CSRF e IRPJ. Nenhum dos 9 documentos do link tem comprovante de pagamento anexado no momento — todos estão em aberto. Nenhuma decisão de pagamento foi tomada; os campos "Pagar?", "Conta origem" e datas abaixo serão preenchidos após retorno do CEO.</p>
+      <h3>Conferência de compliance — recibos e notas fiscais no link</h3>
+      <p>O link recebido é uma pasta de <b>cobranças</b> (notas fiscais, boletos e guias), não de comprovantes: dos 9 documentos nele, <b>nenhum (0 de 9) tem comprovante de pagamento anexado</b> — ou seja, nenhum destes itens foi efetivamente pago ainda, apesar de dois arquivos terem aparecido pagos numa versão anterior (corrigido no painel). Além disso, <b>4 dos 9 itens do link não têm nota fiscal válida</b> — Placas/Transformadores (orçamento informal), Internet (pessoa física), e as duas faturas de Contabilidade (fatura simples sem NF de serviço). Os outros <b>7 itens informados pela administração</b> (DAM da TFF, Aluguel, COFINS, PIS, CSLL, CSRF, IRPJ) simplesmente não constam no link — sem nenhum documento para validar. Nenhuma decisão de pagamento foi tomada; os campos "Pagar?", "Conta origem" e datas serão preenchidos após retorno do CEO.</p>
+    </div>
+
+    <div class="section-title">Compliance documental (só os 9 itens do link)</div>
+    <div class="kpis">
+      <div class="kpi good"><div class="label">Com nota fiscal válida</div><div class="value">3 / 9</div><div class="count">Mat. Computador, Claro, Honorários AJ</div></div>
+      <div class="kpi"><div class="label">Documento oficial (dispensa NF)</div><div class="value">2 / 9</div><div class="count">FGTS, INSS — guias governamentais</div></div>
+      <div class="kpi crit"><div class="label">Sem nota fiscal — gap</div><div class="value">4 / 9</div><div class="count">Placas, Internet, Contabilidade (x2)</div></div>
+      <div class="kpi crit"><div class="label">Com comprovante de pagamento</div><div class="value">0 / 9</div><div class="count">Nenhum item foi pago ainda</div></div>
     </div>
 
     <div class="section-title">Totalizador por categoria</div>
@@ -176,7 +184,7 @@ td.venc{ white-space:nowrap; font-variant-numeric:tabular-nums; }
             <th>O que é</th>
             <th style="text-align:right">Valor</th>
             <th>Status</th>
-            <th>Consta no link?</th>
+            <th>Nota fiscal / Comprovante</th>
             <th>Pagar?</th>
             <th>Conta origem</th>
             <th>Autorização / Pagamento</th>
@@ -323,7 +331,7 @@ function render(filter, term){
       : `<span class="datas">—</span>`;
     const vencTxt = d.venc ? `${d.venc}${d.inferido ? ' <span title="Vencimento inferido, não consta no documento original" style="cursor:help;color:var(--warn);">*</span>' : ''}` : '<span style="color:var(--ink-3);">—</span>';
     const linkTxt = d.noLink
-      ? `<span class="link"><span class="yes">Sim</span> — ${d.nota}<br>${d.recibo}</span>`
+      ? `<span class="link">NF: <span class="${d.nota.startsWith('Sim')?'yes':'no'}">${d.nota}</span><br>Comprovante: <span class="no">${d.recibo}</span></span>`
       : `<span class="link"><span class="no">Não consta no link</span></span>`;
     tr.innerHTML = `
       <td class="venc">${vencTxt}</td>
