@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Painel BPO Financeiro — Demandas de Pagamento</title>
+<style>
+:root{
+  --bg:#f7f4ee; --surface:#ffffff; --surface-2:#f0ebe0;
+  --ink:#231e17; --ink-2:#6d6152; --ink-3:#948a79; --border:#e3dbca;
+  --accent:#7a4a22; --accent-ink:#ffffff;
+  --good:#2f7a4d; --good-bg:#e5f2ea;
+  --warn:#a8681a; --warn-bg:#faf0dd;
+  --crit:#a8362b; --crit-bg:#f8e6e3;
+  --pend:#5b6470; --pend-bg:#eaedf0;
+  --shadow: 0 1px 2px rgba(35,30,23,0.06), 0 4px 16px rgba(35,30,23,0.05);
+}
+:root[data-theme="dark"]{
+  --bg:#17130f; --surface:#211b14; --surface-2:#2a2219;
+  --ink:#f3ede2; --ink-2:#c2b6a2; --ink-3:#93876f; --border:#3c3222;
+  --accent:#d9a15c; --accent-ink:#221708;
+  --good:#59b280; --good-bg:#1c2c22;
+  --warn:#e0a744; --warn-bg:#332813;
+  --crit:#e2766a; --crit-bg:#33201d;
+  --pend:#93a1b0; --pend-bg:#232a30;
+  --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#17130f; --surface:#211b14; --surface-2:#2a2219;
+    --ink:#f3ede2; --ink-2:#c2b6a2; --ink-3:#93876f; --border:#3c3222;
+    --accent:#d9a15c; --accent-ink:#221708;
+    --good:#59b280; --good-bg:#1c2c22;
+    --warn:#e0a744; --warn-bg:#332813;
+    --crit:#e2766a; --crit-bg:#33201d;
+    --pend:#93a1b0; --pend-bg:#232a30;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+  }
+}
+*{box-sizing:border-box;}
+body{margin:0; font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:var(--bg);}
+.dash{ min-height:100vh; padding:28px 20px 60px; }
+.wrap{ max-width:1220px; margin:0 auto; }
+
+.masthead{ display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap;
+  border-bottom:2px solid var(--accent); padding-bottom:16px; margin-bottom:22px; }
+.masthead h1{ font-family:Georgia,"Times New Roman",ui-serif,serif; font-weight:600; font-size:1.6rem; margin:0 0 4px; text-wrap:balance; }
+.masthead .sub{ color:var(--ink-2); font-size:0.9rem; }
+.masthead .meta{ text-align:right; font-size:0.78rem; color:var(--ink-3); line-height:1.5; }
+.masthead .meta b{ color:var(--ink-2); }
+
+.kpis{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px; }
+@media (max-width:760px){ .kpis{ grid-template-columns:repeat(2,1fr);} }
+.kpi{ background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px 16px 14px; box-shadow:var(--shadow); }
+.kpi .label{ font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-3); font-weight:600; }
+.kpi .value{ font-variant-numeric:tabular-nums; font-size:1.5rem; font-weight:700; margin-top:6px; letter-spacing:-0.01em; }
+.kpi .count{ font-size:0.76rem; color:var(--ink-2); margin-top:2px; }
+.kpi.crit .value{ color:var(--crit); } .kpi.warn .value{ color:var(--warn); } .kpi.good .value{ color:var(--good); }
+
+.section-title{ font-size:0.78rem; text-transform:uppercase; letter-spacing:0.07em; color:var(--ink-3); font-weight:700; margin:26px 0 10px; }
+
+.totalizador{ background:var(--surface); border:1px solid var(--border); border-radius:10px; box-shadow:var(--shadow); overflow:hidden; margin-bottom:8px; }
+.totalizador table{ width:100%; border-collapse:collapse; font-size:0.85rem; }
+.totalizador th{ text-align:left; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-3);
+  font-weight:700; padding:9px 14px; background:var(--surface-2); border-bottom:1px solid var(--border); }
+.totalizador td{ padding:9px 14px; border-bottom:1px solid var(--border); }
+.totalizador tr:last-child td{ border-bottom:none; }
+.totalizador tr.grand td{ font-weight:700; background:var(--surface-2); border-top:2px solid var(--accent); }
+.totalizador td.num{ font-variant-numeric:tabular-nums; text-align:right; font-weight:600; white-space:nowrap; }
+
+.alert{ background:var(--warn-bg); border:1px solid color-mix(in srgb, var(--warn) 45%, transparent); border-left:4px solid var(--warn);
+  border-radius:8px; padding:14px 16px; margin-bottom:22px; }
+.alert h3{ margin:0 0 6px; font-size:0.92rem; color:var(--warn); }
+.alert p{ margin:4px 0 0; font-size:0.85rem; color:var(--ink); line-height:1.55; }
+
+.toolbar{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; flex-wrap:wrap; }
+.filters{ display:flex; gap:6px; flex-wrap:wrap; }
+.chip{ border:1px solid var(--border); background:var(--surface); color:var(--ink-2); font-size:0.78rem; padding:6px 12px;
+  border-radius:999px; cursor:pointer; font-weight:600; transition:all .12s ease; }
+.chip:hover{ border-color:var(--accent); color:var(--ink); }
+.chip.active{ background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+.search{ border:1px solid var(--border); background:var(--surface); color:var(--ink); border-radius:8px; padding:7px 12px;
+  font-size:0.82rem; min-width:220px; }
+.search:focus{ outline:2px solid var(--accent); outline-offset:1px; }
+
+.tablewrap{ background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow-x:auto; box-shadow:var(--shadow); }
+table.demandas{ width:100%; border-collapse:collapse; font-size:0.83rem; min-width:1080px; }
+table.demandas thead th{ text-align:left; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-3);
+  font-weight:700; padding:10px 12px; border-bottom:1px solid var(--border); background:var(--surface-2); }
+table.demandas tbody td{ padding:10px 12px; border-bottom:1px solid var(--border); vertical-align:top; color:var(--ink); }
+table.demandas tbody tr:last-child td{ border-bottom:none; }
+table.demandas tbody tr:hover{ background:var(--surface-2); }
+td.num{ font-variant-numeric:tabular-nums; text-align:right; white-space:nowrap; font-weight:600; }
+td.venc{ white-space:nowrap; font-variant-numeric:tabular-nums; }
+.forn{ font-weight:600; } .cat{ display:block; font-size:0.72rem; color:var(--ink-3); margin-top:1px; }
+.pill{ display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:999px; font-size:0.72rem; font-weight:700; white-space:nowrap; }
+.pill::before{ content:""; width:6px; height:6px; border-radius:50%; }
+.pill.venc{ background:var(--crit-bg); color:var(--crit); } .pill.venc::before{ background:var(--crit); }
+.pill.avencer{ background:var(--warn-bg); color:var(--warn); } .pill.avencer::before{ background:var(--warn); }
+.pill.pago{ background:var(--good-bg); color:var(--good); } .pill.pago::before{ background:var(--good); }
+.dias{ display:block; font-size:0.72rem; color:var(--ink-3); margin-top:3px; }
+.doc .yes{ color:var(--good); font-weight:700; } .doc .no{ color:var(--crit); font-weight:700; }
+.decisao{ display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:999px; font-size:0.72rem; font-weight:700; white-space:nowrap; }
+.decisao.pendente{ background:var(--pend-bg); color:var(--pend); }
+.decisao.sim{ background:var(--good-bg); color:var(--good); }
+.decisao.nao{ background:var(--crit-bg); color:var(--crit); }
+.conta{ font-size:0.78rem; color:var(--ink-2); display:block; margin-top:3px; }
+.datas{ font-size:0.74rem; color:var(--ink-3); display:block; margin-top:2px; }
+
+.foot{ margin-top:18px; font-size:0.75rem; color:var(--ink-3); line-height:1.6; }
+</style>
+</head>
+<body>
+<div class="dash">
+  <div class="wrap">
+    <div class="masthead">
+      <div>
+        <h1>Painel BPO Financeiro — Demandas de Pagamento</h1>
+        <div class="sub">Chacreamento Haras Rio São José · Nova Administração — para decisão do CEO</div>
+      </div>
+      <div class="meta">
+        Lote "Agendamentos" recebido do escritório do administrador judicial<br>
+        9 documentos · atualizado em <b id="updated-at">15/07/2026</b>
+      </div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi crit"><div class="label">Vencido</div><div class="value">R$ 605,00</div><div class="count">2 itens — decisão urgente</div></div>
+      <div class="kpi warn"><div class="label">A vencer (≤ 7 dias)</div><div class="value">R$ 4.598,31</div><div class="count">5 itens</div></div>
+      <div class="kpi"><div class="label">Total em aberto</div><div class="value">R$ 5.203,31</div><div class="count">7 itens pendentes de decisão</div></div>
+      <div class="kpi good"><div class="label">Já pago (neste lote)</div><div class="value">R$ 4.609,80</div><div class="count">2 itens — só histórico</div></div>
+    </div>
+
+    <div class="alert">
+      <h3>⚠ Ponto de atenção antes de autorizar</h3>
+      <p>O boleto de <b>honorários do administrador judicial</b> (R$ 3.042,62, vence 20/07) refere-se à competência de julho/2026 — mesmo mês em que houve decisão judicial recente reduzindo o escopo de atuação do AJ. Recomenda-se validação jurídica antes da autorização de pagamento.</p>
+    </div>
+
+    <div class="section-title">Totalizador por categoria</div>
+    <div class="totalizador">
+      <table>
+        <thead><tr><th>Categoria</th><th style="text-align:right">Vencido</th><th style="text-align:right">A vencer</th><th style="text-align:right">Pago</th><th style="text-align:right">Total</th></tr></thead>
+        <tbody id="totalizador-body"></tbody>
+      </table>
+    </div>
+
+    <div class="section-title">Demandas — detalhamento e decisão</div>
+    <div class="toolbar">
+      <div class="filters" id="filters">
+        <button class="chip active" data-f="todos">Todos (9)</button>
+        <button class="chip" data-f="vencido">Vencido (2)</button>
+        <button class="chip" data-f="avencer">A vencer (5)</button>
+        <button class="chip" data-f="pago">Pago (2)</button>
+      </div>
+      <input class="search" id="search" placeholder="Buscar fornecedor, categoria...">
+    </div>
+
+    <div class="tablewrap">
+      <table class="demandas" id="tbl">
+        <thead>
+          <tr>
+            <th>Vencimento</th>
+            <th>Fornecedor / Categoria</th>
+            <th style="text-align:right">Valor</th>
+            <th>Status</th>
+            <th>Nota/Recibo</th>
+            <th>Pagar?</th>
+            <th>Conta origem</th>
+            <th>Autorização / Pagamento</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="foot">
+      Decisões (Pagar? / conta de origem / datas) são registradas pelo BPO após retorno do CEO e republicadas aqui — esta página não salva cliques automaticamente.<br>
+      CNPJ, endereços e demais dados cadastrais completos ficam apenas nos arquivos internos da administração, não nesta página pública.
+    </div>
+  </div>
+</div>
+
+<script>
+// status: vencido | avencer | pago
+// decisao: pendente | sim | nao
+// conta: "Bradesco" | "Caixa" | null
+const data = [
+  {venc:"14/07/2026", vencSort:"2026-07-14", inferido:true, forn:"Hercules Lima Santos (MEI)", cat:"Manutenção/TI",
+   valor:150.00, status:"vencido", dias:"Vencido há 1 dia", nota:"Sim (NFS-e)", recibo:"Não localizado",
+   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null},
+  {venc:"14/07/2026", vencSort:"2026-07-14", inferido:true, forn:"RW Engenharia & Consultoria", cat:"Engenharia/Operacional",
+   valor:455.00, status:"vencido", dias:"Vencido há 1 dia", nota:"Não (orçamento informal)", recibo:"Não",
+   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null},
+  {venc:"17/07/2026", vencSort:"2026-07-17", inferido:false, forn:"Claro S/A", cat:"Telecom",
+   valor:45.99, status:"avencer", dias:"Vence em 2 dias", nota:"Sim (NFCom)", recibo:"Sim (boleto + Pix)",
+   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null},
+  {venc:"18/07/2026", vencSort:"2026-07-18", inferido:false, forn:"Lincomfa Andrade Fontes (PF)", cat:"Telecom/Internet",
+   valor:60.00, status:"avencer", dias:"Vence em 3 dias", nota:"Não (pessoa física)", recibo:"Não",
+   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null},
+  {venc:"20/07/2026", vencSort:"2026-07-20", inferido:false, forn:"Barbosa Dutra Sociedade de Advogados", cat:"Jurídico/Honorários AJ",
+   valor:3042.62, status:"avencer", dias:"Vence em 5 dias", nota:"Sim (NFS-e)", recibo:"Não",
+   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null},
+  {venc:"20/06/2026", vencSort:"2026-06-20", inferido:false, forn:"Realiza Assessoria Contábil", cat:"Contabilidade",
+   valor:2301.10, status:"pago", dias:"Pago em 22/06/2026", nota:"Não (fatura simples)", recibo:"Sim (comprovante)",
+   decisao:"sim", conta:"Bradesco", dataAutorizacao:"20/06/2026", dataPagamento:"22/06/2026"},
+  {venc:"20/07/2026", vencSort:"2026-07-20", inferido:false, forn:"Caixa Econômica Federal (FGTS)", cat:"Tributos/Trabalhista",
+   valor:389.04, status:"avencer", dias:"Vence em 5 dias", nota:"Não (guia oficial)", recibo:"Não",
+   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null},
+  {venc:"20/07/2026", vencSort:"2026-07-20", inferido:false, forn:"Receita Federal (INSS/Contrib.)", cat:"Tributos/Trabalhista",
+   valor:1060.66, status:"avencer", dias:"Vence em 5 dias", nota:"Não (documento oficial)", recibo:"Não",
+   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null},
+  {venc:"26/06/2026", vencSort:"2026-06-26", inferido:false, forn:"Realiza Assessoria Contábil", cat:"Contabilidade",
+   valor:2308.70, status:"pago", dias:"Pago em 26/06/2026", nota:"Não (fatura simples)", recibo:"Sim (comprovante)",
+   decisao:"sim", conta:"Bradesco", dataAutorizacao:"26/06/2026", dataPagamento:"26/06/2026"},
+];
+
+data.sort((a,b)=> a.vencSort.localeCompare(b.vencSort));
+const statusLabel = {vencido:"Vencido", avencer:"A vencer", pago:"Pago"};
+const decisaoLabel = {pendente:"Pendente", sim:"Sim", nao:"Não"};
+const fmt = v => "R$ " + v.toLocaleString("pt-BR", {minimumFractionDigits:2, maximumFractionDigits:2});
+
+function renderTotalizador(){
+  const cats = {};
+  data.forEach(d=>{
+    cats[d.cat] = cats[d.cat] || {vencido:0, avencer:0, pago:0};
+    cats[d.cat][d.status] += d.valor;
+  });
+  const body = document.getElementById("totalizador-body");
+  let gv=0, ga=0, gp=0;
+  Object.keys(cats).forEach(cat=>{
+    const c = cats[cat];
+    gv+=c.vencido; ga+=c.avencer; gp+=c.pago;
+    const total = c.vencido + c.avencer + c.pago;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${cat}</td><td class="num">${c.vencido?fmt(c.vencido):"—"}</td><td class="num">${c.avencer?fmt(c.avencer):"—"}</td><td class="num">${c.pago?fmt(c.pago):"—"}</td><td class="num">${fmt(total)}</td>`;
+    body.appendChild(tr);
+  });
+  const grandTr = document.createElement("tr");
+  grandTr.className = "grand";
+  grandTr.innerHTML = `<td>Total geral</td><td class="num">${fmt(gv)}</td><td class="num">${fmt(ga)}</td><td class="num">${fmt(gp)}</td><td class="num">${fmt(gv+ga+gp)}</td>`;
+  body.appendChild(grandTr);
+}
+
+function render(filter, term){
+  const tbody = document.getElementById("tbody");
+  tbody.innerHTML = "";
+  const rows = data.filter(d => (filter==="todos" || d.status===filter) &&
+    (!term || (d.forn+d.cat).toLowerCase().includes(term.toLowerCase())));
+  rows.forEach(d => {
+    const tr = document.createElement("tr");
+    const conta = d.conta ? `<span class="conta">${d.conta}</span>` : `<span class="conta">—</span>`;
+    const datas = (d.dataAutorizacao || d.dataPagamento)
+      ? `<span class="datas">Aut.: ${d.dataAutorizacao||"—"}</span><span class="datas">Pgto.: ${d.dataPagamento||"—"}</span>`
+      : `<span class="datas">—</span>`;
+    tr.innerHTML = `
+      <td class="venc">${d.venc}${d.inferido ? ' <span title="Vencimento inferido, não consta no documento original" style="cursor:help;color:var(--warn);">*</span>' : ''}</td>
+      <td><span class="forn">${d.forn}</span><span class="cat">${d.cat}</span></td>
+      <td class="num">${fmt(d.valor)}</td>
+      <td><span class="pill ${d.status}">${statusLabel[d.status]}</span><span class="dias">${d.dias}</span></td>
+      <td class="doc"><span class="${d.nota.startsWith('Sim')?'yes':'no'}">${d.nota}</span><br><span class="${d.recibo.startsWith('Sim')?'yes':'no'}">${d.recibo}</span></td>
+      <td><span class="decisao ${d.decisao}">${decisaoLabel[d.decisao]}</span></td>
+      <td>${conta}</td>
+      <td>${datas}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+let currentFilter="todos", currentTerm="";
+document.getElementById("filters").addEventListener("click", e=>{
+  const btn = e.target.closest(".chip"); if(!btn) return;
+  document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
+  btn.classList.add("active"); currentFilter = btn.dataset.f;
+  render(currentFilter, currentTerm);
+});
+document.getElementById("search").addEventListener("input", e=>{
+  currentTerm = e.target.value; render(currentFilter, currentTerm);
+});
+
+renderTotalizador();
+render("todos","");
+</script>
+</body>
+</html>
