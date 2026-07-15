@@ -107,6 +107,18 @@ td.venc{ white-space:nowrap; font-variant-numeric:tabular-nums; }
 .decisao.nao{ background:var(--crit-bg); color:var(--crit); }
 .conta{ font-size:0.78rem; color:var(--ink-2); display:block; margin-top:3px; }
 .datas{ font-size:0.74rem; color:var(--ink-3); display:block; margin-top:2px; }
+.pill.semdoc{ background:var(--pend-bg); color:var(--pend); } .pill.semdoc::before{ background:var(--pend); }
+.tipo{ display:inline-block; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;
+  padding:1px 6px; border-radius:4px; margin-right:6px; vertical-align:middle; }
+.tipo.urgente{ background:var(--crit-bg); color:var(--crit); }
+.tipo.recorrente{ background:var(--surface-2); color:var(--ink-3); }
+.link .yes{ color:var(--good); font-weight:700; } .link .no{ color:var(--crit); font-weight:700; }
+.obs-btn{ background:none; border:1px solid var(--border); color:var(--ink-2); border-radius:6px; font-size:0.72rem;
+  padding:3px 8px; cursor:pointer; font-weight:600; }
+.obs-btn:hover{ border-color:var(--accent); color:var(--ink); }
+.obs-row{ display:none; }
+.obs-row.show{ display:table-row; }
+.obs-row td{ background:var(--surface-2); font-size:0.8rem; color:var(--ink-2); line-height:1.55; padding:10px 12px 14px; }
 
 .foot{ margin-top:18px; font-size:0.75rem; color:var(--ink-3); line-height:1.6; }
 </style>
@@ -120,27 +132,27 @@ td.venc{ white-space:nowrap; font-variant-numeric:tabular-nums; }
         <div class="sub">Chacreamento Haras Rio São José · Nova Administração — para decisão do CEO</div>
       </div>
       <div class="meta">
-        Lote "Agendamentos" recebido do escritório do administrador judicial<br>
-        9 documentos · atualizado em <b id="updated-at">15/07/2026</b>
+        Lote "Agendamentos" (escritório do AJ) + itens informados pela administração<br>
+        16 itens · atualizado em <b id="updated-at">15/07/2026</b>
       </div>
     </div>
 
     <div class="kpis">
       <div class="kpi crit"><div class="label">Vencido</div><div class="value">R$ 605,00</div><div class="count">2 itens — decisão urgente</div></div>
-      <div class="kpi warn"><div class="label">A vencer (≤ 7 dias)</div><div class="value">R$ 4.598,31</div><div class="count">5 itens</div></div>
-      <div class="kpi"><div class="label">Total em aberto</div><div class="value">R$ 5.203,31</div><div class="count">7 itens pendentes de decisão</div></div>
-      <div class="kpi good"><div class="label">Já pago (neste lote)</div><div class="value">R$ 4.609,80</div><div class="count">2 itens — só histórico</div></div>
+      <div class="kpi warn"><div class="label">A vencer</div><div class="value">R$ 9.208,11</div><div class="count">7 itens — todos com documento no link</div></div>
+      <div class="kpi"><div class="label">Sem documento no link</div><div class="value">R$ 12.619,58</div><div class="count">7 itens — só valor informado, confirmar</div></div>
+      <div class="kpi good"><div class="label">Total geral</div><div class="value">R$ 22.432,69</div><div class="count">16 itens — nenhuma decisão tomada ainda</div></div>
     </div>
 
     <div class="alert">
-      <h3>⚠ Ponto de atenção antes de autorizar</h3>
-      <p>O boleto de <b>honorários do administrador judicial</b> (R$ 3.042,62, vence 20/07) refere-se à competência de julho/2026 — mesmo mês em que houve decisão judicial recente reduzindo o escopo de atuação do AJ. Recomenda-se validação jurídica antes da autorização de pagamento.</p>
+      <h3>Conferência do link recebido do escritório do AJ</h3>
+      <p>Dos 16 itens informados, <b>9 têm documento na pasta "Agendamentos"</b> (nota fiscal, boleto ou guia oficial) e <b>7 não constam no link</b> — DAM da TFF, Aluguel, COFINS, PIS, CSLL, CSRF e IRPJ. Nenhum dos 9 documentos do link tem comprovante de pagamento anexado no momento — todos estão em aberto. Nenhuma decisão de pagamento foi tomada; os campos "Pagar?", "Conta origem" e datas abaixo serão preenchidos após retorno do CEO.</p>
     </div>
 
     <div class="section-title">Totalizador por categoria</div>
     <div class="totalizador">
       <table>
-        <thead><tr><th>Categoria</th><th style="text-align:right">Vencido</th><th style="text-align:right">A vencer</th><th style="text-align:right">Pago</th><th style="text-align:right">Total</th></tr></thead>
+        <thead><tr><th>Categoria</th><th style="text-align:right">Vencido</th><th style="text-align:right">A vencer</th><th style="text-align:right">Sem documento</th><th style="text-align:right">Total</th></tr></thead>
         <tbody id="totalizador-body"></tbody>
       </table>
     </div>
@@ -148,10 +160,10 @@ td.venc{ white-space:nowrap; font-variant-numeric:tabular-nums; }
     <div class="section-title">Demandas — detalhamento e decisão</div>
     <div class="toolbar">
       <div class="filters" id="filters">
-        <button class="chip active" data-f="todos">Todos (9)</button>
+        <button class="chip active" data-f="todos">Todos (16)</button>
         <button class="chip" data-f="vencido">Vencido (2)</button>
-        <button class="chip" data-f="avencer">A vencer (5)</button>
-        <button class="chip" data-f="pago">Pago (2)</button>
+        <button class="chip" data-f="avencer">A vencer (7)</button>
+        <button class="chip" data-f="semdoc">Sem documento (7)</button>
       </div>
       <input class="search" id="search" placeholder="Buscar fornecedor, categoria...">
     </div>
@@ -161,13 +173,14 @@ td.venc{ white-space:nowrap; font-variant-numeric:tabular-nums; }
         <thead>
           <tr>
             <th>Vencimento</th>
-            <th>Fornecedor / Categoria</th>
+            <th>O que é</th>
             <th style="text-align:right">Valor</th>
             <th>Status</th>
-            <th>Nota/Recibo</th>
+            <th>Consta no link?</th>
             <th>Pagar?</th>
             <th>Conta origem</th>
             <th>Autorização / Pagamento</th>
+            <th></th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
@@ -182,63 +195,118 @@ td.venc{ white-space:nowrap; font-variant-numeric:tabular-nums; }
 </div>
 
 <script>
-// status: vencido | avencer | pago
+// status: vencido | avencer | semdoc
 // decisao: pendente | sim | nao
 // conta: "Bradesco" | "Caixa" | null
+// tipo: urgente | recorrente
 const data = [
-  {venc:"14/07/2026", vencSort:"2026-07-14", inferido:true, forn:"Hercules Lima Santos (MEI)", cat:"Manutenção/TI",
-   valor:150.00, status:"vencido", dias:"Vencido há 1 dia", nota:"Sim (NFS-e)", recibo:"Não localizado",
-   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null},
-  {venc:"14/07/2026", vencSort:"2026-07-14", inferido:true, forn:"RW Engenharia & Consultoria", cat:"Engenharia/Operacional",
-   valor:455.00, status:"vencido", dias:"Vencido há 1 dia", nota:"Não (orçamento informal)", recibo:"Não",
-   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null},
-  {venc:"17/07/2026", vencSort:"2026-07-17", inferido:false, forn:"Claro S/A", cat:"Telecom",
-   valor:45.99, status:"avencer", dias:"Vence em 2 dias", nota:"Sim (NFCom)", recibo:"Sim (boleto + Pix)",
-   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null},
-  {venc:"18/07/2026", vencSort:"2026-07-18", inferido:false, forn:"Lincomfa Andrade Fontes (PF)", cat:"Telecom/Internet",
-   valor:60.00, status:"avencer", dias:"Vence em 3 dias", nota:"Não (pessoa física)", recibo:"Não",
-   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null},
-  {venc:"20/07/2026", vencSort:"2026-07-20", inferido:false, forn:"Barbosa Dutra Sociedade de Advogados", cat:"Jurídico/Honorários AJ",
-   valor:3042.62, status:"avencer", dias:"Vence em 5 dias", nota:"Sim (NFS-e)", recibo:"Não",
-   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null},
-  {venc:"20/06/2026", vencSort:"2026-06-20", inferido:false, forn:"Realiza Assessoria Contábil", cat:"Contabilidade",
-   valor:2301.10, status:"pago", dias:"Pago em 22/06/2026", nota:"Não (fatura simples)", recibo:"Sim (comprovante)",
-   decisao:"sim", conta:"Bradesco", dataAutorizacao:"20/06/2026", dataPagamento:"22/06/2026"},
-  {venc:"20/07/2026", vencSort:"2026-07-20", inferido:false, forn:"Caixa Econômica Federal (FGTS)", cat:"Tributos/Trabalhista",
-   valor:389.04, status:"avencer", dias:"Vence em 5 dias", nota:"Não (guia oficial)", recibo:"Não",
-   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null},
-  {venc:"20/07/2026", vencSort:"2026-07-20", inferido:false, forn:"Receita Federal (INSS/Contrib.)", cat:"Tributos/Trabalhista",
-   valor:1060.66, status:"avencer", dias:"Vence em 5 dias", nota:"Não (documento oficial)", recibo:"Não",
-   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null},
-  {venc:"26/06/2026", vencSort:"2026-06-26", inferido:false, forn:"Realiza Assessoria Contábil", cat:"Contabilidade",
-   valor:2308.70, status:"pago", dias:"Pago em 26/06/2026", nota:"Não (fatura simples)", recibo:"Sim (comprovante)",
-   decisao:"sim", conta:"Bradesco", dataAutorizacao:"26/06/2026", dataPagamento:"26/06/2026"},
+  {tipo:"urgente", venc:"14/07/2026", vencSort:"2026-07-14", inferido:true, forn:"Hercules Lima Santos (MEI)", cat:"Manutenção/TI",
+   desc:"Manutenção do computador (CPU) do escritório de Poções — substituição da fonte de alimentação e da placa de vídeo.",
+   valor:150.00, status:"vencido", dias:"Vencido há 1 dia", noLink:true, nota:"Sim (NFS-e)", recibo:"Não localizado",
+   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   obs:"Vencimento não consta no documento (apenas a NFS-e); inferido do nome do arquivo — confirmar prazo com o prestador antes de pagar."},
+  {tipo:"urgente", venc:"14/07/2026", vencSort:"2026-07-14", inferido:true, forn:"RW Engenharia & Consultoria", cat:"Engenharia/Operacional",
+   desc:"Confecção de placas de identificação dos transformadores — exigência da Coelba para agendar a vistoria da concessionária.",
+   valor:455.00, status:"vencido", dias:"Vencido há 1 dia", noLink:true, nota:"Não (orçamento informal)", recibo:"Não",
+   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   obs:"Sem nota fiscal, apenas orçamento do fornecedor. Necessária para atender exigência da Coelba — sem esta despesa a vistoria da concessionária não é agendada."},
+  {tipo:"urgente", venc:null, vencSort:"9999-99-99", inferido:false, forn:"A confirmar", cat:"Tributos",
+   desc:"DAM da TFF (Taxa de Fiscalização de Funcionamento) — Exercício 2026.",
+   valor:234.52, status:"semdoc", dias:"Vencimento não informado", noLink:false, nota:"—", recibo:"—",
+   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   obs:"Não consta na pasta \"Agendamentos\" recebida do escritório do AJ. Valor e descrição informados apenas pela administração — solicitar a guia/DAM antes de autorizar."},
+  {tipo:"recorrente", venc:"17/07/2026", vencSort:"2026-07-17", inferido:false, forn:"Claro S/A", cat:"Telecom",
+   desc:"Conta de telefone — escritório de Poções.",
+   valor:45.99, status:"avencer", dias:"Vence em 2 dias", noLink:true, nota:"Sim (NFCom)", recibo:"Sim (boleto + Pix, sem comprovante de pagamento ainda)",
+   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   obs:"Débito automático configurado no Banco Santander — confirmar se a conta ainda será debitada após a transição bancária para o Bradesco."},
+  {tipo:"recorrente", venc:"18/07/2026", vencSort:"2026-07-18", inferido:false, forn:"Lincomfa Andrade Fontes (PF)", cat:"Telecom/Internet",
+   desc:"Internet — mensalidade recorrente.",
+   valor:60.00, status:"avencer", dias:"Vence em 3 dias", noLink:true, nota:"Não (pessoa física)", recibo:"Não",
+   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   obs:"Contrato recorrente mensal com pessoa física, sem nota fiscal — avaliar formalização (MEI). Há mais 6 parcelas idênticas já emitidas até jan/2027."},
+  {tipo:"recorrente", venc:"20/07/2026", vencSort:"2026-07-20", inferido:false, forn:"Barbosa Dutra Sociedade de Advogados", cat:"Jurídico/Honorários AJ",
+   desc:"Honorários da Administração Judicial — competência 07/2026.",
+   valor:3042.62, status:"avencer", dias:"Vence em 5 dias", noLink:true, nota:"Sim (NFS-e)", recibo:"Não",
+   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   obs:"Valor mantido em relação à cobrança anterior. Multa de 2% a partir de 21/07/2026, mora de 1% a.m., data limite 19/08/2026."},
+  {tipo:"recorrente", venc:"20/07/2026", vencSort:"2026-07-20", inferido:false, forn:"Realiza Assessoria Contábil", cat:"Contabilidade",
+   desc:"Mensalidade da Contabilidade.",
+   valor:2301.10, status:"avencer", dias:"Vence em 5 dias", noLink:true, nota:"Não (fatura simples)", recibo:"Não (sem comprovante de pagamento)",
+   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   obs:"O arquivo no link foi atualizado pelo escritório do AJ em 15/07/2026: a versão anterior mostrava esta fatura já paga em 22/06/2026 (Bradesco); a nova versão é um boleto diferente, mesmo valor, ainda em aberto. Confirmar com a contabilidade se é cobrança duplicada ou nova competência."},
+  {tipo:"recorrente", venc:"26/07/2026", vencSort:"2026-07-26", inferido:false, forn:"Realiza Assessoria Contábil", cat:"Contabilidade",
+   desc:"Acordo da Contabilidade.",
+   valor:2308.70, status:"avencer", dias:"Vence em 11 dias", noLink:true, nota:"Não (fatura simples)", recibo:"Não (sem comprovante de pagamento)",
+   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   obs:"Arquivo no link atualizado em 15/07/2026: vencimento corrigido de 27/07 para 26/07/2026; a versão anterior mostrava pagamento já efetuado em 26/06/2026 (Bradesco), a nova é um boleto diferente, mesmo valor, em aberto. Confirmar com a contabilidade o objeto do \"acordo\"."},
+  {tipo:"recorrente", venc:null, vencSort:"9999-99-99", inferido:false, forn:"A confirmar", cat:"Aluguel",
+   desc:"Aluguel.",
+   valor:865.00, status:"semdoc", dias:"Vencimento não informado", noLink:false, nota:"—", recibo:"—",
+   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   obs:"Não consta na pasta \"Agendamentos\". Confirmar beneficiário, conta e vencimento antes de autorizar."},
+  {tipo:"recorrente", venc:"20/07/2026", vencSort:"2026-07-20", inferido:false, forn:"Caixa Econômica Federal (FGTS)", cat:"Tributos/Trabalhista",
+   desc:"FGTS — competência 06/2026.",
+   valor:389.04, status:"avencer", dias:"Vence em 5 dias", noLink:true, nota:"Não (guia oficial)", recibo:"Não",
+   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   obs:"Guia oficial (GFD), 2 trabalhadores — confirmar com a folha de pagamento."},
+  {tipo:"recorrente", venc:"20/07/2026", vencSort:"2026-07-20", inferido:false, forn:"Receita Federal (INSS/Contrib.)", cat:"Tributos/Trabalhista",
+   desc:"INSS — competência 06/2026 (patronal + segurados + terceiros).",
+   valor:1060.66, status:"avencer", dias:"Vence em 5 dias", noLink:true, nota:"Não (documento oficial)", recibo:"Não",
+   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   obs:"DARF oficial — mesma competência da guia de FGTS acima."},
+  {tipo:"recorrente", venc:null, vencSort:"9999-99-99", inferido:false, forn:"A confirmar", cat:"Tributos",
+   desc:"COFINS.",
+   valor:3425.01, status:"semdoc", dias:"Vencimento não informado", noLink:false, nota:"—", recibo:"—",
+   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   obs:"Não consta na pasta \"Agendamentos\" — solicitar o DARF correspondente antes de autorizar."},
+  {tipo:"recorrente", venc:null, vencSort:"9999-99-99", inferido:false, forn:"A confirmar", cat:"Tributos",
+   desc:"PIS.",
+   valor:742.08, status:"semdoc", dias:"Vencimento não informado", noLink:false, nota:"—", recibo:"—",
+   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   obs:"Não consta na pasta \"Agendamentos\" — solicitar o DARF correspondente antes de autorizar."},
+  {tipo:"recorrente", venc:null, vencSort:"9999-99-99", inferido:false, forn:"A confirmar", cat:"Tributos",
+   desc:"CSLL.",
+   valor:3388.54, status:"semdoc", dias:"Vencimento não informado", noLink:false, nota:"—", recibo:"—",
+   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   obs:"Não consta na pasta \"Agendamentos\" — solicitar o DARF correspondente antes de autorizar."},
+  {tipo:"recorrente", venc:null, vencSort:"9999-99-99", inferido:false, forn:"A confirmar", cat:"Tributos",
+   desc:"CSRF (Contribuição Social Retida na Fonte).",
+   valor:199.38, status:"semdoc", dias:"Vencimento não informado", noLink:false, nota:"—", recibo:"—",
+   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   obs:"Não consta na pasta \"Agendamentos\" — solicitar o documento correspondente antes de autorizar."},
+  {tipo:"recorrente", venc:null, vencSort:"9999-99-99", inferido:false, forn:"A confirmar", cat:"Tributos",
+   desc:"IRPJ.",
+   valor:3765.05, status:"semdoc", dias:"Vencimento não informado", noLink:false, nota:"—", recibo:"—",
+   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   obs:"Não consta na pasta \"Agendamentos\" — solicitar o DARF correspondente antes de autorizar."},
 ];
 
 data.sort((a,b)=> a.vencSort.localeCompare(b.vencSort));
-const statusLabel = {vencido:"Vencido", avencer:"A vencer", pago:"Pago"};
+const statusLabel = {vencido:"Vencido", avencer:"A vencer", semdoc:"Sem documento"};
 const decisaoLabel = {pendente:"Pendente", sim:"Sim", nao:"Não"};
 const fmt = v => "R$ " + v.toLocaleString("pt-BR", {minimumFractionDigits:2, maximumFractionDigits:2});
 
 function renderTotalizador(){
   const cats = {};
+  const order = [];
   data.forEach(d=>{
-    cats[d.cat] = cats[d.cat] || {vencido:0, avencer:0, pago:0};
+    if(!cats[d.cat]){ cats[d.cat] = {vencido:0, avencer:0, semdoc:0}; order.push(d.cat); }
     cats[d.cat][d.status] += d.valor;
   });
   const body = document.getElementById("totalizador-body");
-  let gv=0, ga=0, gp=0;
-  Object.keys(cats).forEach(cat=>{
+  let gv=0, ga=0, gs=0;
+  order.forEach(cat=>{
     const c = cats[cat];
-    gv+=c.vencido; ga+=c.avencer; gp+=c.pago;
-    const total = c.vencido + c.avencer + c.pago;
+    gv+=c.vencido; ga+=c.avencer; gs+=c.semdoc;
+    const total = c.vencido + c.avencer + c.semdoc;
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${cat}</td><td class="num">${c.vencido?fmt(c.vencido):"—"}</td><td class="num">${c.avencer?fmt(c.avencer):"—"}</td><td class="num">${c.pago?fmt(c.pago):"—"}</td><td class="num">${fmt(total)}</td>`;
+    tr.innerHTML = `<td>${cat}</td><td class="num">${c.vencido?fmt(c.vencido):"—"}</td><td class="num">${c.avencer?fmt(c.avencer):"—"}</td><td class="num">${c.semdoc?fmt(c.semdoc):"—"}</td><td class="num">${fmt(total)}</td>`;
     body.appendChild(tr);
   });
   const grandTr = document.createElement("tr");
   grandTr.className = "grand";
-  grandTr.innerHTML = `<td>Total geral</td><td class="num">${fmt(gv)}</td><td class="num">${fmt(ga)}</td><td class="num">${fmt(gp)}</td><td class="num">${fmt(gv+ga+gp)}</td>`;
+  grandTr.innerHTML = `<td>Total geral</td><td class="num">${fmt(gv)}</td><td class="num">${fmt(ga)}</td><td class="num">${fmt(gs)}</td><td class="num">${fmt(gv+ga+gs)}</td>`;
   body.appendChild(grandTr);
 }
 
@@ -246,24 +314,38 @@ function render(filter, term){
   const tbody = document.getElementById("tbody");
   tbody.innerHTML = "";
   const rows = data.filter(d => (filter==="todos" || d.status===filter) &&
-    (!term || (d.forn+d.cat).toLowerCase().includes(term.toLowerCase())));
-  rows.forEach(d => {
+    (!term || (d.forn+d.cat+d.desc).toLowerCase().includes(term.toLowerCase())));
+  rows.forEach((d,i) => {
     const tr = document.createElement("tr");
     const conta = d.conta ? `<span class="conta">${d.conta}</span>` : `<span class="conta">—</span>`;
     const datas = (d.dataAutorizacao || d.dataPagamento)
       ? `<span class="datas">Aut.: ${d.dataAutorizacao||"—"}</span><span class="datas">Pgto.: ${d.dataPagamento||"—"}</span>`
       : `<span class="datas">—</span>`;
+    const vencTxt = d.venc ? `${d.venc}${d.inferido ? ' <span title="Vencimento inferido, não consta no documento original" style="cursor:help;color:var(--warn);">*</span>' : ''}` : '<span style="color:var(--ink-3);">—</span>';
+    const linkTxt = d.noLink
+      ? `<span class="link"><span class="yes">Sim</span> — ${d.nota}<br>${d.recibo}</span>`
+      : `<span class="link"><span class="no">Não consta no link</span></span>`;
     tr.innerHTML = `
-      <td class="venc">${d.venc}${d.inferido ? ' <span title="Vencimento inferido, não consta no documento original" style="cursor:help;color:var(--warn);">*</span>' : ''}</td>
-      <td><span class="forn">${d.forn}</span><span class="cat">${d.cat}</span></td>
+      <td class="venc">${vencTxt}</td>
+      <td><span class="tipo ${d.tipo}">${d.tipo}</span><span class="forn">${d.forn}</span><span class="cat">${d.desc}</span></td>
       <td class="num">${fmt(d.valor)}</td>
       <td><span class="pill ${d.status}">${statusLabel[d.status]}</span><span class="dias">${d.dias}</span></td>
-      <td class="doc"><span class="${d.nota.startsWith('Sim')?'yes':'no'}">${d.nota}</span><br><span class="${d.recibo.startsWith('Sim')?'yes':'no'}">${d.recibo}</span></td>
+      <td class="doc">${linkTxt}</td>
       <td><span class="decisao ${d.decisao}">${decisaoLabel[d.decisao]}</span></td>
       <td>${conta}</td>
       <td>${datas}</td>
+      <td><button class="obs-btn" data-i="${i}">detalhes</button></td>
     `;
     tbody.appendChild(tr);
+
+    const obsTr = document.createElement("tr");
+    obsTr.className = "obs-row";
+    obsTr.id = "obs-" + i;
+    obsTr.innerHTML = `<td colspan="9"><b>Categoria:</b> ${d.cat} &nbsp;·&nbsp; <b>Observação:</b> ${d.obs}</td>`;
+    tbody.appendChild(obsTr);
+  });
+  tbody.querySelectorAll(".obs-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=> document.getElementById("obs-"+btn.dataset.i).classList.toggle("show"));
   });
 }
 
