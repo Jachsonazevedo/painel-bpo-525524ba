@@ -258,6 +258,21 @@ td.venc{ white-space:nowrap; font-variant-numeric:tabular-nums; }
       <div class="foot" style="margin-top:10px;">Este parecer é o documento que o Marcelo encaminha ao Victor Barbosa Dutra pedindo a regularização (notas fiscais, contratos e documentos faltantes) antes da reprogramação do pagamento.</div>
     </div>
 
+    <div class="section-title">E-mail de compliance para o Victor</div>
+    <div class="resumo">
+      <label style="display:block; font-size:0.76rem; color:var(--ink-2); font-weight:700; margin-bottom:4px;">Assunto</label>
+      <input type="text" id="email-assunto" readonly style="width:100%; border:1px solid var(--border); border-radius:8px; padding:9px 10px; background:var(--surface-2); color:var(--ink); font-size:0.85rem; margin-bottom:10px;">
+      <label style="display:block; font-size:0.76rem; color:var(--ink-2); font-weight:700; margin-bottom:4px;">Corpo do e-mail</label>
+      <textarea id="email-corpo" readonly style="min-height:340px;" placeholder="Clique em &quot;Gerar e-mail&quot;."></textarea>
+      <div class="resumo-actions">
+        <button class="btn-secondary" id="btn-gerar-email">Gerar e-mail</button>
+        <button class="btn-secondary" id="btn-copiar-email">Copiar assunto + corpo</button>
+        <a class="btn-wa" id="btn-abrir-email" href="#" style="background:var(--accent);">✉ Abrir no e-mail</a>
+        <span class="copied" id="copied-msg-email" style="display:none;">Copiado!</span>
+      </div>
+      <div class="foot" style="margin-top:10px;">Destinatário sugerido: <b>adm@barbosadutra.com.br</b> (e-mail administrativo do escritório, encontrado nas notas fiscais recebidas) — confirme se é o endereço certo antes de enviar. O botão "Abrir no e-mail" usa o programa de e-mail padrão deste computador.</div>
+    </div>
+
     <div class="section-title">Resumo da aprovação (decisão do CEO)</div>
     <div class="resumo">
       <div class="resumo-stats">
@@ -540,6 +555,45 @@ function gerarParecer(){
   return txt;
 }
 
+function gerarEmail(){
+  const comPendencia = data.filter(d => d.faltando.length > 0);
+  const semPendencia = data.filter(d => d.faltando.length === 0);
+  const valorPendencia = comPendencia.reduce((a,d)=>a+d.valor,0);
+
+  const assunto = "Pendências documentais identificadas pelo Compliance — Chacreamento Haras Rio São José Ltda (Nova Administração)";
+
+  const linhas = [];
+  linhas.push("Prezado Sr. Victor Barbosa Dutra,");
+  linhas.push("");
+  linhas.push("Em atenção às demandas de pagamento encaminhadas por seu escritório para conhecimento e providências da Chacreamento Haras Rio São José Ltda, informamos que, com a Nova Administração, toda demanda de pagamento passa a ser submetida à análise prévia do nosso compliance antes de qualquer autorização.");
+  linhas.push("");
+  linhas.push("Na conferência dos 16 itens recebidos/informados, o compliance identificou " + comPendencia.length + " pendências documentais, totalizando " + fmt(valorPendencia) + ", relacionadas no checklist abaixo. Registramos também que, até o momento, não recebemos nenhum documento — físico ou digital — do acervo da empresa, o que impede a validação completa de parte destas cobranças.");
+  linhas.push("");
+  linhas.push("CHECKLIST DE PENDÊNCIAS — " + comPendencia.length + " de " + data.length + " itens");
+  linhas.push("(regra geral: todo item precisa de nota fiscal ou documento oficial equivalente, contrato quando aplicável, e comprovante de pagamento após a execução)");
+  linhas.push("");
+  comPendencia.forEach((d,i)=>{
+    linhas.push(`${i+1}. [ ] ${d.desc} — ${d.forn} — ${fmt(d.valor)}`);
+    d.faltando.forEach(f=> linhas.push(`      • Falta: ${f}`));
+  });
+  linhas.push("");
+  linhas.push("ITENS SEM PENDÊNCIA — " + semPendencia.length + " de " + data.length + " (documentação já em ordem):");
+  semPendencia.forEach(d=> linhas.push(`- ${d.desc} — ${d.forn} — ${fmt(d.valor)}`));
+  linhas.push("");
+  linhas.push("Solicitamos a gentileza de providenciar os documentos e esclarecimentos do checklist acima o quanto antes. Assim que as pendências forem sanadas, o Sr. Marcelo Nunes Azevedo procederá com a aprovação e programação dos pagamentos correspondentes.");
+  linhas.push("");
+  linhas.push("Permanecemos à disposição para qualquer esclarecimento adicional.");
+  linhas.push("");
+  linhas.push("Atenciosamente,");
+  linhas.push("Compliance — Nova Administração");
+  linhas.push("Chacreamento Haras Rio São José Ltda");
+
+  const corpo = linhas.join("\n");
+  document.getElementById("email-assunto").value = assunto;
+  document.getElementById("email-corpo").value = corpo;
+  return {assunto, corpo};
+}
+
 let currentFilter="todos", currentTerm="";
 document.getElementById("filters").addEventListener("click", e=>{
   const btn = e.target.closest(".chip"); if(!btn) return;
@@ -579,6 +633,24 @@ document.getElementById("btn-copiar-parecer").addEventListener("click", async ()
 document.getElementById("btn-wa-parecer").addEventListener("click", (e)=>{
   const txt = document.getElementById("parecer-txt").value || gerarParecer();
   e.currentTarget.href = "https://wa.me/?text=" + encodeURIComponent(txt);
+});
+document.getElementById("btn-gerar-email").addEventListener("click", gerarEmail);
+document.getElementById("btn-copiar-email").addEventListener("click", async ()=>{
+  const assunto = document.getElementById("email-assunto").value;
+  const corpo = document.getElementById("email-corpo").value;
+  if(!corpo){ gerarEmail(); }
+  const txt = "Assunto: " + document.getElementById("email-assunto").value + "\n\n" + document.getElementById("email-corpo").value;
+  try{
+    await navigator.clipboard.writeText(txt);
+    const msg = document.getElementById("copied-msg-email");
+    msg.style.display = "inline"; setTimeout(()=> msg.style.display="none", 2000);
+  }catch(e){}
+});
+document.getElementById("btn-abrir-email").addEventListener("click", (e)=>{
+  if(!document.getElementById("email-corpo").value) gerarEmail();
+  const assunto = document.getElementById("email-assunto").value;
+  const corpo = document.getElementById("email-corpo").value;
+  e.currentTarget.href = "mailto:adm@barbosadutra.com.br?subject=" + encodeURIComponent(assunto) + "&body=" + encodeURIComponent(corpo);
 });
 
 renderTotalizador();
