@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Painel BPO Financeiro — Demandas de Pagamento</title>
+<title>Painel BPO Financeiro — Aprovação de Pagamentos</title>
 <style>
 :root{
   --bg:#f7f4ee; --surface:#ffffff; --surface-2:#f0ebe0;
@@ -14,6 +14,7 @@
   --warn:#a8681a; --warn-bg:#faf0dd;
   --crit:#a8362b; --crit-bg:#f8e6e3;
   --pend:#5b6470; --pend-bg:#eaedf0;
+  --wa:#25865a;
   --shadow: 0 1px 2px rgba(35,30,23,0.06), 0 4px 16px rgba(35,30,23,0.05);
 }
 :root[data-theme="dark"]{
@@ -24,6 +25,7 @@
   --warn:#e0a744; --warn-bg:#332813;
   --crit:#e2766a; --crit-bg:#33201d;
   --pend:#93a1b0; --pend-bg:#232a30;
+  --wa:#3ecf8e;
   --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
 }
 @media (prefers-color-scheme: dark){
@@ -35,13 +37,21 @@
     --warn:#e0a744; --warn-bg:#332813;
     --crit:#e2766a; --crit-bg:#33201d;
     --pend:#93a1b0; --pend-bg:#232a30;
+    --wa:#3ecf8e;
     --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
   }
 }
 *{box-sizing:border-box;}
 body{margin:0; font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:var(--bg);}
 .dash{ min-height:100vh; padding:28px 20px 60px; }
-.wrap{ max-width:1220px; margin:0 auto; }
+.wrap{ max-width:1260px; margin:0 auto; }
+
+.sharebar{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
+  background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:10px 14px; margin-bottom:16px; box-shadow:var(--shadow); }
+.sharebar span{ font-size:0.8rem; color:var(--ink-2); }
+.btn-wa{ display:inline-flex; align-items:center; gap:7px; background:var(--wa); color:#fff; border:none; border-radius:8px;
+  padding:8px 14px; font-size:0.82rem; font-weight:700; cursor:pointer; text-decoration:none; white-space:nowrap; }
+.btn-wa:hover{ filter:brightness(1.08); }
 
 .masthead{ display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap;
   border-bottom:2px solid var(--accent); padding-bottom:16px; margin-bottom:22px; }
@@ -85,7 +95,7 @@ body{margin:0; font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-
 .search:focus{ outline:2px solid var(--accent); outline-offset:1px; }
 
 .tablewrap{ background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow-x:auto; box-shadow:var(--shadow); }
-table.demandas{ width:100%; border-collapse:collapse; font-size:0.83rem; min-width:1080px; }
+table.demandas{ width:100%; border-collapse:collapse; font-size:0.83rem; min-width:1220px; }
 table.demandas thead th{ text-align:left; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-3);
   font-weight:700; padding:10px 12px; border-bottom:1px solid var(--border); background:var(--surface-2); }
 table.demandas tbody td{ padding:10px 12px; border-bottom:1px solid var(--border); vertical-align:top; color:var(--ink); }
@@ -98,27 +108,47 @@ td.venc{ white-space:nowrap; font-variant-numeric:tabular-nums; }
 .pill::before{ content:""; width:6px; height:6px; border-radius:50%; }
 .pill.venc{ background:var(--crit-bg); color:var(--crit); } .pill.venc::before{ background:var(--crit); }
 .pill.avencer{ background:var(--warn-bg); color:var(--warn); } .pill.avencer::before{ background:var(--warn); }
-.pill.pago{ background:var(--good-bg); color:var(--good); } .pill.pago::before{ background:var(--good); }
-.dias{ display:block; font-size:0.72rem; color:var(--ink-3); margin-top:3px; }
-.doc .yes{ color:var(--good); font-weight:700; } .doc .no{ color:var(--crit); font-weight:700; }
-.decisao{ display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:999px; font-size:0.72rem; font-weight:700; white-space:nowrap; }
-.decisao.pendente{ background:var(--pend-bg); color:var(--pend); }
-.decisao.sim{ background:var(--good-bg); color:var(--good); }
-.decisao.nao{ background:var(--crit-bg); color:var(--crit); }
-.conta{ font-size:0.78rem; color:var(--ink-2); display:block; margin-top:3px; }
-.datas{ font-size:0.74rem; color:var(--ink-3); display:block; margin-top:2px; }
 .pill.semdoc{ background:var(--pend-bg); color:var(--pend); } .pill.semdoc::before{ background:var(--pend); }
+.dias{ display:block; font-size:0.72rem; color:var(--ink-3); margin-top:3px; }
+.link .yes{ color:var(--good); font-weight:700; } .link .no{ color:var(--crit); font-weight:700; }
+.compliance{ display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:999px; font-size:0.72rem; font-weight:700; white-space:nowrap; margin-bottom:5px; }
+.compliance.ok{ background:var(--good-bg); color:var(--good); }
+.compliance.pendencia{ background:var(--warn-bg); color:var(--warn); }
+.compliance.semdoc{ background:var(--crit-bg); color:var(--crit); }
+
 .tipo{ display:inline-block; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;
   padding:1px 6px; border-radius:4px; margin-right:6px; vertical-align:middle; }
 .tipo.urgente{ background:var(--crit-bg); color:var(--crit); }
 .tipo.recorrente{ background:var(--surface-2); color:var(--ink-3); }
-.link .yes{ color:var(--good); font-weight:700; } .link .no{ color:var(--crit); font-weight:700; }
+
+.decisao-ctrl{ display:flex; gap:4px; flex-wrap:wrap; }
+.dbtn{ border:1px solid var(--border); background:var(--surface); color:var(--ink-2); font-size:0.7rem; font-weight:700;
+  padding:4px 9px; border-radius:6px; cursor:pointer; }
+.dbtn:hover{ border-color:var(--accent); }
+.dbtn.aprovar.active{ background:var(--good); border-color:var(--good); color:#fff; }
+.dbtn.reprovar.active{ background:var(--crit); border-color:var(--crit); color:#fff; }
+.contasel{ margin-top:6px; font-size:0.76rem; border:1px solid var(--border); background:var(--surface); color:var(--ink);
+  border-radius:6px; padding:4px 6px; width:100%; }
+.decisaodata{ font-size:0.7rem; color:var(--ink-3); margin-top:4px; display:block; }
+
 .obs-btn{ background:none; border:1px solid var(--border); color:var(--ink-2); border-radius:6px; font-size:0.72rem;
   padding:3px 8px; cursor:pointer; font-weight:600; }
 .obs-btn:hover{ border-color:var(--accent); color:var(--ink); }
 .obs-row{ display:none; }
 .obs-row.show{ display:table-row; }
 .obs-row td{ background:var(--surface-2); font-size:0.8rem; color:var(--ink-2); line-height:1.55; padding:10px 12px 14px; }
+.obs-row b.tag{ color:var(--accent); }
+
+.resumo{ background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px; margin-top:10px; box-shadow:var(--shadow); }
+.resumo-stats{ display:flex; gap:18px; flex-wrap:wrap; margin-bottom:12px; font-size:0.85rem; }
+.resumo-stats b{ font-variant-numeric:tabular-nums; }
+.resumo textarea{ width:100%; min-height:160px; font-family:ui-monospace,Consolas,monospace; font-size:0.78rem;
+  border:1px solid var(--border); border-radius:8px; padding:10px; background:var(--surface-2); color:var(--ink); resize:vertical; }
+.resumo-actions{ display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+.btn-secondary{ border:1px solid var(--border); background:var(--surface); color:var(--ink); font-size:0.8rem; font-weight:700;
+  padding:8px 14px; border-radius:8px; cursor:pointer; }
+.btn-secondary:hover{ border-color:var(--accent); }
+.copied{ color:var(--good); font-size:0.78rem; font-weight:700; margin-left:6px; }
 
 .foot{ margin-top:18px; font-size:0.75rem; color:var(--ink-3); line-height:1.6; }
 </style>
@@ -126,14 +156,20 @@ td.venc{ white-space:nowrap; font-variant-numeric:tabular-nums; }
 <body>
 <div class="dash">
   <div class="wrap">
+
+    <div class="sharebar">
+      <span>Compartilhe este painel com o CEO para análise e aprovação:</span>
+      <a class="btn-wa" id="btn-share-link" href="#" target="_blank" rel="noopener">↗ Enviar link no WhatsApp</a>
+    </div>
+
     <div class="masthead">
       <div>
-        <h1>Painel BPO Financeiro — Demandas de Pagamento</h1>
-        <div class="sub">Chacreamento Haras Rio São José · Nova Administração — para decisão do CEO</div>
+        <h1>Painel BPO Financeiro — Aprovação de Pagamentos</h1>
+        <div class="sub">Chacreamento Haras Rio São José · Nova Administração — decisão do CEO</div>
       </div>
       <div class="meta">
         Lote "Agendamentos" (escritório do AJ) + itens informados pela administração<br>
-        16 itens · atualizado em <b id="updated-at">15/07/2026</b>
+        16 itens · atualizado em <b>15/07/2026</b>
       </div>
     </div>
 
@@ -141,12 +177,12 @@ td.venc{ white-space:nowrap; font-variant-numeric:tabular-nums; }
       <div class="kpi crit"><div class="label">Vencido</div><div class="value">R$ 605,00</div><div class="count">2 itens — decisão urgente</div></div>
       <div class="kpi warn"><div class="label">A vencer</div><div class="value">R$ 9.208,11</div><div class="count">7 itens — todos com documento no link</div></div>
       <div class="kpi"><div class="label">Sem documento no link</div><div class="value">R$ 12.619,58</div><div class="count">7 itens — só valor informado, confirmar</div></div>
-      <div class="kpi good"><div class="label">Total geral</div><div class="value">R$ 22.432,69</div><div class="count">16 itens — nenhuma decisão tomada ainda</div></div>
+      <div class="kpi good"><div class="label">Total geral</div><div class="value">R$ 22.432,69</div><div class="count">16 itens</div></div>
     </div>
 
     <div class="alert">
       <h3>Conferência de compliance — recibos e notas fiscais no link</h3>
-      <p>O link recebido é uma pasta de <b>cobranças</b> (notas fiscais, boletos e guias), não de comprovantes: dos 9 documentos nele, <b>nenhum (0 de 9) tem comprovante de pagamento anexado</b> — ou seja, nenhum destes itens foi efetivamente pago ainda, apesar de dois arquivos terem aparecido pagos numa versão anterior (corrigido no painel). Além disso, <b>4 dos 9 itens do link não têm nota fiscal válida</b> — Placas/Transformadores (orçamento informal), Internet (pessoa física), e as duas faturas de Contabilidade (fatura simples sem NF de serviço). Os outros <b>7 itens informados pela administração</b> (DAM da TFF, Aluguel, COFINS, PIS, CSLL, CSRF, IRPJ) simplesmente não constam no link — sem nenhum documento para validar. Nenhuma decisão de pagamento foi tomada; os campos "Pagar?", "Conta origem" e datas serão preenchidos após retorno do CEO.</p>
+      <p>O link recebido é uma pasta de <b>cobranças</b> (notas fiscais, boletos e guias), não de comprovantes: dos 9 documentos nele, <b>nenhum (0 de 9) tem comprovante de pagamento anexado</b> — nenhum destes itens foi efetivamente pago ainda. <b>4 dos 9 itens do link não têm nota fiscal válida</b> — Placas/Transformadores (orçamento informal), Internet (pessoa física), e as duas faturas de Contabilidade (fatura simples sem NF de serviço). Os outros <b>7 itens informados pela administração</b> (DAM da TFF, Aluguel, COFINS, PIS, CSLL, CSRF, IRPJ) não constam no link — sem documento para validar. Cada item abaixo traz a observação do BPO e o status de compliance para orientar a decisão de aprovação.</p>
     </div>
 
     <div class="section-title">Compliance documental (só os 9 itens do link)</div>
@@ -165,7 +201,7 @@ td.venc{ white-space:nowrap; font-variant-numeric:tabular-nums; }
       </table>
     </div>
 
-    <div class="section-title">Demandas — detalhamento e decisão</div>
+    <div class="section-title">Demandas — análise e aprovação item a item</div>
     <div class="toolbar">
       <div class="filters" id="filters">
         <button class="chip active" data-f="todos">Todos (16)</button>
@@ -184,10 +220,8 @@ td.venc{ white-space:nowrap; font-variant-numeric:tabular-nums; }
             <th>O que é</th>
             <th style="text-align:right">Valor</th>
             <th>Status</th>
-            <th>Nota fiscal / Comprovante</th>
-            <th>Pagar?</th>
-            <th>Conta origem</th>
-            <th>Autorização / Pagamento</th>
+            <th>Compliance / NF / Comprovante</th>
+            <th>Decisão do CEO</th>
             <th></th>
           </tr>
         </thead>
@@ -195,8 +229,25 @@ td.venc{ white-space:nowrap; font-variant-numeric:tabular-nums; }
       </table>
     </div>
 
+    <div class="section-title">Resumo da aprovação</div>
+    <div class="resumo">
+      <div class="resumo-stats">
+        <span>Aprovados: <b id="st-aprovados">0</b></span>
+        <span>Reprovados: <b id="st-reprovados">0</b></span>
+        <span>Pendentes: <b id="st-pendentes">16</b></span>
+        <span>Valor aprovado: <b id="st-valor">R$ 0,00</b></span>
+      </div>
+      <textarea id="resumo-txt" readonly placeholder="Clique em &quot;Gerar resumo&quot; depois de decidir os itens abaixo."></textarea>
+      <div class="resumo-actions">
+        <button class="btn-secondary" id="btn-gerar">Gerar resumo</button>
+        <button class="btn-secondary" id="btn-copiar">Copiar resumo</button>
+        <a class="btn-wa" id="btn-wa-resumo" href="#" target="_blank" rel="noopener">↗ Enviar resumo no WhatsApp</a>
+        <span class="copied" id="copied-msg" style="display:none;">Copiado!</span>
+      </div>
+    </div>
+
     <div class="foot">
-      Decisões (Pagar? / conta de origem / datas) são registradas pelo BPO após retorno do CEO e republicadas aqui — esta página não salva cliques automaticamente.<br>
+      As decisões marcadas aqui ficam salvas neste navegador (não em um servidor). Depois de decidir, use "Gerar resumo" e envie de volta por WhatsApp para o BPO consolidar e programar os pagamentos aprovados.<br>
       CNPJ, endereços e demais dados cadastrais completos ficam apenas nos arquivos internos da administração, não nesta página pública.
     </div>
   </div>
@@ -204,96 +255,89 @@ td.venc{ white-space:nowrap; font-variant-numeric:tabular-nums; }
 
 <script>
 // status: vencido | avencer | semdoc
-// decisao: pendente | sim | nao
-// conta: "Bradesco" | "Caixa" | null
+// compliance: ok | pendencia | semdoc
 // tipo: urgente | recorrente
 const data = [
-  {tipo:"urgente", venc:"14/07/2026", vencSort:"2026-07-14", inferido:true, forn:"Hercules Lima Santos (MEI)", cat:"Manutenção/TI",
+  {id:1, tipo:"urgente", venc:"14/07/2026", vencSort:"2026-07-14", inferido:true, forn:"Hercules Lima Santos (MEI)", cat:"Manutenção/TI",
    desc:"Manutenção do computador (CPU) do escritório de Poções — substituição da fonte de alimentação e da placa de vídeo.",
-   valor:150.00, status:"vencido", dias:"Vencido há 1 dia", noLink:true, nota:"Sim (NFS-e)", recibo:"Não localizado",
-   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   valor:150.00, status:"vencido", dias:"Vencido há 1 dia", noLink:true, nota:"Sim (NFS-e)", recibo:"Não localizado", compliance:"ok",
    obs:"Vencimento não consta no documento (apenas a NFS-e); inferido do nome do arquivo — confirmar prazo com o prestador antes de pagar."},
-  {tipo:"urgente", venc:"14/07/2026", vencSort:"2026-07-14", inferido:true, forn:"RW Engenharia & Consultoria", cat:"Engenharia/Operacional",
+  {id:2, tipo:"urgente", venc:"14/07/2026", vencSort:"2026-07-14", inferido:true, forn:"RW Engenharia & Consultoria", cat:"Engenharia/Operacional",
    desc:"Confecção de placas de identificação dos transformadores — exigência da Coelba para agendar a vistoria da concessionária.",
-   valor:455.00, status:"vencido", dias:"Vencido há 1 dia", noLink:true, nota:"Não (orçamento informal)", recibo:"Não",
-   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   valor:455.00, status:"vencido", dias:"Vencido há 1 dia", noLink:true, nota:"Não (orçamento informal)", recibo:"Não", compliance:"pendencia",
    obs:"Sem nota fiscal, apenas orçamento do fornecedor. Necessária para atender exigência da Coelba — sem esta despesa a vistoria da concessionária não é agendada."},
-  {tipo:"urgente", venc:null, vencSort:"9999-99-99", inferido:false, forn:"A confirmar", cat:"Tributos",
+  {id:10, tipo:"urgente", venc:null, vencSort:"9999-99-99", inferido:false, forn:"A confirmar", cat:"Tributos",
    desc:"DAM da TFF (Taxa de Fiscalização de Funcionamento) — Exercício 2026.",
-   valor:234.52, status:"semdoc", dias:"Vencimento não informado", noLink:false, nota:"—", recibo:"—",
-   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   valor:234.52, status:"semdoc", dias:"Vencimento não informado", noLink:false, nota:"—", recibo:"—", compliance:"semdoc",
    obs:"Não consta na pasta \"Agendamentos\" recebida do escritório do AJ. Valor e descrição informados apenas pela administração — solicitar a guia/DAM antes de autorizar."},
-  {tipo:"recorrente", venc:"17/07/2026", vencSort:"2026-07-17", inferido:false, forn:"Claro S/A", cat:"Telecom",
+  {id:3, tipo:"recorrente", venc:"17/07/2026", vencSort:"2026-07-17", inferido:false, forn:"Claro S/A", cat:"Telecom",
    desc:"Conta de telefone — escritório de Poções.",
-   valor:45.99, status:"avencer", dias:"Vence em 2 dias", noLink:true, nota:"Sim (NFCom)", recibo:"Sim (boleto + Pix, sem comprovante de pagamento ainda)",
-   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   valor:45.99, status:"avencer", dias:"Vence em 2 dias", noLink:true, nota:"Sim (NFCom)", recibo:"Sim (boleto + Pix, sem comprovante de pagamento ainda)", compliance:"ok",
    obs:"Débito automático configurado no Banco Santander — confirmar se a conta ainda será debitada após a transição bancária para o Bradesco."},
-  {tipo:"recorrente", venc:"18/07/2026", vencSort:"2026-07-18", inferido:false, forn:"Lincomfa Andrade Fontes (PF)", cat:"Telecom/Internet",
+  {id:4, tipo:"recorrente", venc:"18/07/2026", vencSort:"2026-07-18", inferido:false, forn:"Lincomfa Andrade Fontes (PF)", cat:"Telecom/Internet",
    desc:"Internet — mensalidade recorrente.",
-   valor:60.00, status:"avencer", dias:"Vence em 3 dias", noLink:true, nota:"Não (pessoa física)", recibo:"Não",
-   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   valor:60.00, status:"avencer", dias:"Vence em 3 dias", noLink:true, nota:"Não (pessoa física)", recibo:"Não", compliance:"pendencia",
    obs:"Contrato recorrente mensal com pessoa física, sem nota fiscal — avaliar formalização (MEI). Há mais 6 parcelas idênticas já emitidas até jan/2027."},
-  {tipo:"recorrente", venc:"20/07/2026", vencSort:"2026-07-20", inferido:false, forn:"Barbosa Dutra Sociedade de Advogados", cat:"Jurídico/Honorários AJ",
+  {id:5, tipo:"recorrente", venc:"20/07/2026", vencSort:"2026-07-20", inferido:false, forn:"Barbosa Dutra Sociedade de Advogados", cat:"Jurídico/Honorários AJ",
    desc:"Honorários da Administração Judicial — competência 07/2026.",
-   valor:3042.62, status:"avencer", dias:"Vence em 5 dias", noLink:true, nota:"Sim (NFS-e)", recibo:"Não",
-   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   valor:3042.62, status:"avencer", dias:"Vence em 5 dias", noLink:true, nota:"Sim (NFS-e)", recibo:"Não", compliance:"ok",
    obs:"Valor mantido em relação à cobrança anterior. Multa de 2% a partir de 21/07/2026, mora de 1% a.m., data limite 19/08/2026."},
-  {tipo:"recorrente", venc:"20/07/2026", vencSort:"2026-07-20", inferido:false, forn:"Realiza Assessoria Contábil", cat:"Contabilidade",
+  {id:6, tipo:"recorrente", venc:"20/07/2026", vencSort:"2026-07-20", inferido:false, forn:"Realiza Assessoria Contábil", cat:"Contabilidade",
    desc:"Mensalidade da Contabilidade.",
-   valor:2301.10, status:"avencer", dias:"Vence em 5 dias", noLink:true, nota:"Não (fatura simples)", recibo:"Não (sem comprovante de pagamento)",
-   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   valor:2301.10, status:"avencer", dias:"Vence em 5 dias", noLink:true, nota:"Não (fatura simples)", recibo:"Não (sem comprovante de pagamento)", compliance:"pendencia",
    obs:"O arquivo no link foi atualizado pelo escritório do AJ em 15/07/2026: a versão anterior mostrava esta fatura já paga em 22/06/2026 (Bradesco); a nova versão é um boleto diferente, mesmo valor, ainda em aberto. Confirmar com a contabilidade se é cobrança duplicada ou nova competência."},
-  {tipo:"recorrente", venc:"26/07/2026", vencSort:"2026-07-26", inferido:false, forn:"Realiza Assessoria Contábil", cat:"Contabilidade",
-   desc:"Acordo da Contabilidade.",
-   valor:2308.70, status:"avencer", dias:"Vence em 11 dias", noLink:true, nota:"Não (fatura simples)", recibo:"Não (sem comprovante de pagamento)",
-   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
-   obs:"Arquivo no link atualizado em 15/07/2026: vencimento corrigido de 27/07 para 26/07/2026; a versão anterior mostrava pagamento já efetuado em 26/06/2026 (Bradesco), a nova é um boleto diferente, mesmo valor, em aberto. Confirmar com a contabilidade o objeto do \"acordo\"."},
-  {tipo:"recorrente", venc:null, vencSort:"9999-99-99", inferido:false, forn:"A confirmar", cat:"Aluguel",
-   desc:"Aluguel.",
-   valor:865.00, status:"semdoc", dias:"Vencimento não informado", noLink:false, nota:"—", recibo:"—",
-   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
-   obs:"Não consta na pasta \"Agendamentos\". Confirmar beneficiário, conta e vencimento antes de autorizar."},
-  {tipo:"recorrente", venc:"20/07/2026", vencSort:"2026-07-20", inferido:false, forn:"Caixa Econômica Federal (FGTS)", cat:"Tributos/Trabalhista",
+  {id:7, tipo:"recorrente", venc:"20/07/2026", vencSort:"2026-07-20", inferido:false, forn:"Caixa Econômica Federal (FGTS)", cat:"Tributos/Trabalhista",
    desc:"FGTS — competência 06/2026.",
-   valor:389.04, status:"avencer", dias:"Vence em 5 dias", noLink:true, nota:"Não (guia oficial)", recibo:"Não",
-   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   valor:389.04, status:"avencer", dias:"Vence em 5 dias", noLink:true, nota:"Não (guia oficial)", recibo:"Não", compliance:"ok",
    obs:"Guia oficial (GFD), 2 trabalhadores — confirmar com a folha de pagamento."},
-  {tipo:"recorrente", venc:"20/07/2026", vencSort:"2026-07-20", inferido:false, forn:"Receita Federal (INSS/Contrib.)", cat:"Tributos/Trabalhista",
+  {id:8, tipo:"recorrente", venc:"20/07/2026", vencSort:"2026-07-20", inferido:false, forn:"Receita Federal (INSS/Contrib.)", cat:"Tributos/Trabalhista",
    desc:"INSS — competência 06/2026 (patronal + segurados + terceiros).",
-   valor:1060.66, status:"avencer", dias:"Vence em 5 dias", noLink:true, nota:"Não (documento oficial)", recibo:"Não",
-   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   valor:1060.66, status:"avencer", dias:"Vence em 5 dias", noLink:true, nota:"Não (documento oficial)", recibo:"Não", compliance:"ok",
    obs:"DARF oficial — mesma competência da guia de FGTS acima."},
-  {tipo:"recorrente", venc:null, vencSort:"9999-99-99", inferido:false, forn:"A confirmar", cat:"Tributos",
+  {id:9, tipo:"recorrente", venc:"26/07/2026", vencSort:"2026-07-26", inferido:false, forn:"Realiza Assessoria Contábil", cat:"Contabilidade",
+   desc:"Acordo da Contabilidade.",
+   valor:2308.70, status:"avencer", dias:"Vence em 11 dias", noLink:true, nota:"Não (fatura simples)", recibo:"Não (sem comprovante de pagamento)", compliance:"pendencia",
+   obs:"Arquivo no link atualizado em 15/07/2026: vencimento corrigido de 27/07 para 26/07/2026; a versão anterior mostrava pagamento já efetuado em 26/06/2026 (Bradesco), a nova é um boleto diferente, mesmo valor, em aberto. Confirmar com a contabilidade o objeto do \"acordo\"."},
+  {id:11, tipo:"recorrente", venc:null, vencSort:"9999-99-99", inferido:false, forn:"A confirmar", cat:"Aluguel",
+   desc:"Aluguel.",
+   valor:865.00, status:"semdoc", dias:"Vencimento não informado", noLink:false, nota:"—", recibo:"—", compliance:"semdoc",
+   obs:"Não consta na pasta \"Agendamentos\". Confirmar beneficiário, conta e vencimento antes de autorizar."},
+  {id:12, tipo:"recorrente", venc:null, vencSort:"9999-99-99", inferido:false, forn:"A confirmar", cat:"Tributos",
    desc:"COFINS.",
-   valor:3425.01, status:"semdoc", dias:"Vencimento não informado", noLink:false, nota:"—", recibo:"—",
-   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   valor:3425.01, status:"semdoc", dias:"Vencimento não informado", noLink:false, nota:"—", recibo:"—", compliance:"semdoc",
    obs:"Não consta na pasta \"Agendamentos\" — solicitar o DARF correspondente antes de autorizar."},
-  {tipo:"recorrente", venc:null, vencSort:"9999-99-99", inferido:false, forn:"A confirmar", cat:"Tributos",
+  {id:13, tipo:"recorrente", venc:null, vencSort:"9999-99-99", inferido:false, forn:"A confirmar", cat:"Tributos",
    desc:"PIS.",
-   valor:742.08, status:"semdoc", dias:"Vencimento não informado", noLink:false, nota:"—", recibo:"—",
-   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   valor:742.08, status:"semdoc", dias:"Vencimento não informado", noLink:false, nota:"—", recibo:"—", compliance:"semdoc",
    obs:"Não consta na pasta \"Agendamentos\" — solicitar o DARF correspondente antes de autorizar."},
-  {tipo:"recorrente", venc:null, vencSort:"9999-99-99", inferido:false, forn:"A confirmar", cat:"Tributos",
+  {id:14, tipo:"recorrente", venc:null, vencSort:"9999-99-99", inferido:false, forn:"A confirmar", cat:"Tributos",
    desc:"CSLL.",
-   valor:3388.54, status:"semdoc", dias:"Vencimento não informado", noLink:false, nota:"—", recibo:"—",
-   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   valor:3388.54, status:"semdoc", dias:"Vencimento não informado", noLink:false, nota:"—", recibo:"—", compliance:"semdoc",
    obs:"Não consta na pasta \"Agendamentos\" — solicitar o DARF correspondente antes de autorizar."},
-  {tipo:"recorrente", venc:null, vencSort:"9999-99-99", inferido:false, forn:"A confirmar", cat:"Tributos",
+  {id:15, tipo:"recorrente", venc:null, vencSort:"9999-99-99", inferido:false, forn:"A confirmar", cat:"Tributos",
    desc:"CSRF (Contribuição Social Retida na Fonte).",
-   valor:199.38, status:"semdoc", dias:"Vencimento não informado", noLink:false, nota:"—", recibo:"—",
-   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   valor:199.38, status:"semdoc", dias:"Vencimento não informado", noLink:false, nota:"—", recibo:"—", compliance:"semdoc",
    obs:"Não consta na pasta \"Agendamentos\" — solicitar o documento correspondente antes de autorizar."},
-  {tipo:"recorrente", venc:null, vencSort:"9999-99-99", inferido:false, forn:"A confirmar", cat:"Tributos",
+  {id:16, tipo:"recorrente", venc:null, vencSort:"9999-99-99", inferido:false, forn:"A confirmar", cat:"Tributos",
    desc:"IRPJ.",
-   valor:3765.05, status:"semdoc", dias:"Vencimento não informado", noLink:false, nota:"—", recibo:"—",
-   decisao:"pendente", conta:null, dataAutorizacao:null, dataPagamento:null,
+   valor:3765.05, status:"semdoc", dias:"Vencimento não informado", noLink:false, nota:"—", recibo:"—", compliance:"semdoc",
    obs:"Não consta na pasta \"Agendamentos\" — solicitar o DARF correspondente antes de autorizar."},
 ];
 
 data.sort((a,b)=> a.vencSort.localeCompare(b.vencSort));
 const statusLabel = {vencido:"Vencido", avencer:"A vencer", semdoc:"Sem documento"};
-const decisaoLabel = {pendente:"Pendente", sim:"Sim", nao:"Não"};
+const complianceLabel = {ok:"Compliance OK", pendencia:"Falta nota fiscal", semdoc:"Falta documento"};
 const fmt = v => "R$ " + v.toLocaleString("pt-BR", {minimumFractionDigits:2, maximumFractionDigits:2});
+
+const STORAGE_KEY = "bpo-haras-decisoes-v1";
+function loadDecisions(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }catch(e){ return {}; } }
+function saveDecisions(map){ localStorage.setItem(STORAGE_KEY, JSON.stringify(map)); }
+let decisions = loadDecisions();
+
+function todayBR(){
+  const d = new Date();
+  return d.toLocaleDateString("pt-BR");
+}
 
 function renderTotalizador(){
   const cats = {};
@@ -303,6 +347,7 @@ function renderTotalizador(){
     cats[d.cat][d.status] += d.valor;
   });
   const body = document.getElementById("totalizador-body");
+  body.innerHTML = "";
   let gv=0, ga=0, gs=0;
   order.forEach(cat=>{
     const c = cats[cat];
@@ -323,38 +368,104 @@ function render(filter, term){
   tbody.innerHTML = "";
   const rows = data.filter(d => (filter==="todos" || d.status===filter) &&
     (!term || (d.forn+d.cat+d.desc).toLowerCase().includes(term.toLowerCase())));
-  rows.forEach((d,i) => {
+  rows.forEach((d) => {
+    const dec = decisions[d.id] || {decisao:"pendente", conta:"", data:null};
     const tr = document.createElement("tr");
-    const conta = d.conta ? `<span class="conta">${d.conta}</span>` : `<span class="conta">—</span>`;
-    const datas = (d.dataAutorizacao || d.dataPagamento)
-      ? `<span class="datas">Aut.: ${d.dataAutorizacao||"—"}</span><span class="datas">Pgto.: ${d.dataPagamento||"—"}</span>`
-      : `<span class="datas">—</span>`;
     const vencTxt = d.venc ? `${d.venc}${d.inferido ? ' <span title="Vencimento inferido, não consta no documento original" style="cursor:help;color:var(--warn);">*</span>' : ''}` : '<span style="color:var(--ink-3);">—</span>';
     const linkTxt = d.noLink
-      ? `<span class="link">NF: <span class="${d.nota.startsWith('Sim')?'yes':'no'}">${d.nota}</span><br>Comprovante: <span class="no">${d.recibo}</span></span>`
-      : `<span class="link"><span class="no">Não consta no link</span></span>`;
+      ? `NF: <span class="${d.nota.startsWith('Sim')?'yes':'no'}">${d.nota}</span><br>Comprovante: <span class="no">${d.recibo}</span>`
+      : `<span class="no">Não consta no link</span>`;
+    const contaOptions = ["", "Bradesco", "Caixa"].map(c => `<option value="${c}" ${dec.conta===c?"selected":""}>${c||"Conta de origem..."}</option>`).join("");
     tr.innerHTML = `
       <td class="venc">${vencTxt}</td>
       <td><span class="tipo ${d.tipo}">${d.tipo}</span><span class="forn">${d.forn}</span><span class="cat">${d.desc}</span></td>
       <td class="num">${fmt(d.valor)}</td>
       <td><span class="pill ${d.status}">${statusLabel[d.status]}</span><span class="dias">${d.dias}</span></td>
-      <td class="doc">${linkTxt}</td>
-      <td><span class="decisao ${d.decisao}">${decisaoLabel[d.decisao]}</span></td>
-      <td>${conta}</td>
-      <td>${datas}</td>
-      <td><button class="obs-btn" data-i="${i}">detalhes</button></td>
+      <td class="doc">
+        <span class="compliance ${d.compliance}">${complianceLabel[d.compliance]}</span><br>
+        <span class="link">${linkTxt}</span>
+      </td>
+      <td>
+        <div class="decisao-ctrl">
+          <button class="dbtn aprovar ${dec.decisao==='aprovar'?'active':''}" data-id="${d.id}" data-act="aprovar">Aprovar</button>
+          <button class="dbtn reprovar ${dec.decisao==='reprovar'?'active':''}" data-id="${d.id}" data-act="reprovar">Reprovar</button>
+        </div>
+        ${dec.decisao==='aprovar' ? `<select class="contasel" data-id="${d.id}">${contaOptions}</select>` : ''}
+        ${dec.data ? `<span class="decisaodata">Decidido em ${dec.data}</span>` : ''}
+      </td>
+      <td><button class="obs-btn" data-i="${d.id}">detalhes</button></td>
     `;
     tbody.appendChild(tr);
 
     const obsTr = document.createElement("tr");
     obsTr.className = "obs-row";
-    obsTr.id = "obs-" + i;
-    obsTr.innerHTML = `<td colspan="9"><b>Categoria:</b> ${d.cat} &nbsp;·&nbsp; <b>Observação:</b> ${d.obs}</td>`;
+    obsTr.id = "obs-" + d.id;
+    obsTr.innerHTML = `<td colspan="7"><b class="tag">Categoria:</b> ${d.cat} &nbsp;·&nbsp; <b class="tag">Observação do BPO:</b> ${d.obs}</td>`;
     tbody.appendChild(obsTr);
   });
+
   tbody.querySelectorAll(".obs-btn").forEach(btn=>{
     btn.addEventListener("click", ()=> document.getElementById("obs-"+btn.dataset.i).classList.toggle("show"));
   });
+  tbody.querySelectorAll(".dbtn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const id = btn.dataset.id, act = btn.dataset.act;
+      const current = decisions[id] || {decisao:"pendente", conta:"", data:null};
+      const newDecisao = current.decisao === act ? "pendente" : act;
+      decisions[id] = {decisao:newDecisao, conta: newDecisao==="aprovar" ? current.conta : "", data: newDecisao==="pendente" ? null : todayBR()};
+      saveDecisions(decisions);
+      render(currentFilter, currentTerm);
+      updateStats();
+    });
+  });
+  tbody.querySelectorAll(".contasel").forEach(sel=>{
+    sel.addEventListener("change", ()=>{
+      const id = sel.dataset.id;
+      const current = decisions[id] || {decisao:"aprovar", conta:"", data:todayBR()};
+      current.conta = sel.value;
+      decisions[id] = current;
+      saveDecisions(decisions);
+      updateStats();
+    });
+  });
+}
+
+function updateStats(){
+  let aprovados=0, reprovados=0, pendentes=0, valorAprovado=0;
+  data.forEach(d=>{
+    const dec = decisions[d.id];
+    if(dec && dec.decisao==="aprovar"){ aprovados++; valorAprovado += d.valor; }
+    else if(dec && dec.decisao==="reprovar"){ reprovados++; }
+    else pendentes++;
+  });
+  document.getElementById("st-aprovados").textContent = aprovados;
+  document.getElementById("st-reprovados").textContent = reprovados;
+  document.getElementById("st-pendentes").textContent = pendentes;
+  document.getElementById("st-valor").textContent = fmt(valorAprovado);
+}
+
+function gerarResumo(){
+  const linhas = [];
+  linhas.push("RESUMO DE APROVAÇÃO — Painel BPO Financeiro (Haras Rio São José)");
+  linhas.push("Data: " + todayBR());
+  linhas.push("");
+  data.forEach(d=>{
+    const dec = decisions[d.id] || {decisao:"pendente", conta:""};
+    const marca = dec.decisao === "aprovar" ? "✅ APROVADO" : dec.decisao === "reprovar" ? "❌ REPROVADO" : "⏳ PENDENTE";
+    let linha = `${marca} — ${d.desc} (${d.forn}) — ${fmt(d.valor)}`;
+    if(dec.decisao === "aprovar") linha += ` — conta: ${dec.conta || "NÃO INFORMADA"}`;
+    if(d.compliance !== "ok") linha += ` — [${complianceLabel[d.compliance]}]`;
+    linhas.push(linha);
+  });
+  linhas.push("");
+  const aprovados = data.filter(d=> decisions[d.id] && decisions[d.id].decisao==="aprovar");
+  const semConta = aprovados.filter(d=> !decisions[d.id].conta);
+  if(semConta.length) linhas.push(`⚠ ${semConta.length} item(ns) aprovado(s) sem conta de origem definida — escolher Bradesco ou Caixa antes de programar.`);
+  const semDoc = aprovados.filter(d=> d.compliance === "semdoc");
+  if(semDoc.length) linhas.push(`⚠ ${semDoc.length} item(ns) aprovado(s) sem nenhum documento no link — obter o comprovante/guia antes de programar o pagamento.`);
+  const txt = linhas.join("\n");
+  document.getElementById("resumo-txt").value = txt;
+  return txt;
 }
 
 let currentFilter="todos", currentTerm="";
@@ -367,9 +478,27 @@ document.getElementById("filters").addEventListener("click", e=>{
 document.getElementById("search").addEventListener("input", e=>{
   currentTerm = e.target.value; render(currentFilter, currentTerm);
 });
+document.getElementById("btn-gerar").addEventListener("click", gerarResumo);
+document.getElementById("btn-copiar").addEventListener("click", async ()=>{
+  const txt = document.getElementById("resumo-txt").value || gerarResumo();
+  try{
+    await navigator.clipboard.writeText(txt);
+    const msg = document.getElementById("copied-msg");
+    msg.style.display = "inline"; setTimeout(()=> msg.style.display="none", 2000);
+  }catch(e){}
+});
+document.getElementById("btn-wa-resumo").addEventListener("click", (e)=>{
+  const txt = document.getElementById("resumo-txt").value || gerarResumo();
+  e.currentTarget.href = "https://wa.me/?text=" + encodeURIComponent(txt);
+});
+document.getElementById("btn-share-link").addEventListener("click", (e)=>{
+  const msg = "Marcelo, segue o painel de pagamentos pendentes para sua análise e aprovação (compliance já conferido pelo BPO): " + location.href;
+  e.currentTarget.href = "https://wa.me/?text=" + encodeURIComponent(msg);
+});
 
 renderTotalizador();
 render("todos","");
+updateStats();
 </script>
 </body>
 </html>
